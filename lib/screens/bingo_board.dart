@@ -1,23 +1,27 @@
 import 'dart:async';
 import 'package:amingo/screens/event_details.dart';
 import 'package:amingo/screens/game_monitor.dart';
-import 'package:amingo/screens/role_selection.dart';
 import 'package:flutter/material.dart';
 import 'bingo_tile.dart';
-import 'friend_verification.dart';
 
 class BingoBoard extends StatefulWidget {
   final String eventName;
   final String hostName;
-  final int timelimit;
+  final String hostPfp;
+  final int durationMinutes;
   final String description;
+  final String location;
+  final String dateHosted;
 
   const BingoBoard({
     super.key,
     required this.eventName,
     required this.hostName,
-    required this.timelimit,
+    required this.hostPfp,
+    required this.durationMinutes,
     required this.description,
+    required this.location,
+    required this.dateHosted,
   });
 
   @override
@@ -38,11 +42,10 @@ class _BingoBoardState extends State<BingoBoard> {
   void initState() {
     super.initState();
 
-    timeLeft = widget.timelimit;
+    timeLeft = widget.durationMinutes * 60;
 
     board = generateBoard();
 
-    // TIMER LOGIC
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (timeLeft <= 0) {
         t.cancel();
@@ -66,7 +69,6 @@ class _BingoBoardState extends State<BingoBoard> {
     super.dispose();
   }
 
-  // bingo board with Free tile
   List<BingoCell> generateBoard() {
     List<String> letters = List.generate(
       25,
@@ -82,31 +84,15 @@ class _BingoBoardState extends State<BingoBoard> {
         .toList();
   }
 
-  // TILE MARKING
-  Future<void> onTileTap(int index) async {
+  void onTileTap(int index) {
     final cell = board[index];
 
     if (cell.isMarked || cell.letter == "FREE") return;
 
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => FriendVerification(letter: cell.letter),
-      ),
-    );
-
-    if (!mounted) return;
-
-    if (result == true) {
-      setState(() {
-        board[index] = cell.copyWith(isMarked: true);
-        checkedTiles++;
-      });
-
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text("${cell.letter} verified")));
-    }
+    setState(() {
+      board[index] = cell.copyWith(isMarked: true);
+      checkedTiles++;
+    });
   }
 
   String formatTime(int seconds) {
@@ -124,8 +110,6 @@ class _BingoBoardState extends State<BingoBoard> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-
-      // APP BAR
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         centerTitle: true,
@@ -145,70 +129,51 @@ class _BingoBoardState extends State<BingoBoard> {
         ),
 
         actions: [
-          Flexible(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EventDetails(
-                          eventName: widget.eventName,
-                          hostName: widget.hostName,
-                          hostPfp: 'https://i.pravatar.cc/150?img=6',
-                          joinOrStart: 'PLAY',
-                          duration: 120,
-                          description: widget.description,
-                          // calendar_date: '',
-                          // day: '',
-                          // mainLocation: '',
-                          // subLocation: '',
-                        ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EventDetails(
+                        eventName: widget.eventName,
+                        hostName: widget.hostName,
+                        hostPfp: widget.hostPfp,
+                        joinOrStart: 'Play',
+                        duration: widget.durationMinutes,
+                        description: widget.description,
+                        location: widget.location,
+                        dateHosted: widget.dateHosted,
                       ),
-                    );
-                  },
-                  child: const Text("LEAVE"),
-                ),
-
-                SizedBox(width: width * 0.04),
-
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("TOTAL SCORE", style: TextStyle(fontSize: 9)),
-                    Text(
-                      "$score",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
-
-                SizedBox(width: width * 0.03),
-
-                IconButton(
-                  icon: const Icon(Icons.person),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Roleselection()),
-                    ); // to be navigated to the profile page
-                  },
-                ),
-              ],
-            ),
+                  );
+                },
+                child: const Text("LEAVE"),
+              ),
+              SizedBox(width: width * 0.04),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("TOTAL SCORE", style: TextStyle(fontSize: 9)),
+                  Text(
+                    "$score",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(width: width * 0.03),
+            ],
           ),
         ],
       ),
 
-      // BODY
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
 
           children: [
-            // Event Name
             Text(
               widget.eventName,
               maxLines: 1,
@@ -220,12 +185,10 @@ class _BingoBoardState extends State<BingoBoard> {
               ),
             ),
 
-            // host name
             Text("Hosted By: ${widget.hostName}", style: textTheme.titleSmall),
 
             SizedBox(height: height * 0.05),
 
-            // BINGO BOARD
             Container(
               width: width * 0.9,
               height: height * 0.6,
@@ -235,7 +198,6 @@ class _BingoBoardState extends State<BingoBoard> {
                 borderRadius: BorderRadius.circular(20),
               ),
 
-              // BINGO HEADING
               child: Column(
                 children: [
                   Text(
@@ -331,7 +293,6 @@ class _BingoBoardState extends State<BingoBoard> {
         ),
       ),
 
-      // BOTTOM NAV
       bottomNavigationBar: SafeArea(
         child: Container(
           margin: const EdgeInsets.all(10),
@@ -351,14 +312,12 @@ class _BingoBoardState extends State<BingoBoard> {
                       builder: (context) => EventDetails(
                         eventName: widget.eventName,
                         hostName: widget.hostName,
-                        hostPfp: 'https://i.pravatar.cc/150?img=6',
-                        joinOrStart: 'PLAY',
-                        duration: 120,
+                        hostPfp: widget.hostPfp,
+                        joinOrStart: 'Play',
+                        duration: widget.durationMinutes,
                         description: widget.description,
-                        // calendar_date: '15th October 2026',
-                        // day: 'Monday',
-                        // mainLocation: '',
-                        // subLocation: '',
+                        location: widget.location,
+                        dateHosted: widget.dateHosted,
                       ),
                     ),
                   );
@@ -400,7 +359,6 @@ class _BingoBoardState extends State<BingoBoard> {
                 ],
               ),
 
-              //Navigation to the leaderBoard, temporary navigation to GameMonitor
               GestureDetector(
                 onTap: () {
                   Navigator.pushReplacement(
@@ -408,7 +366,7 @@ class _BingoBoardState extends State<BingoBoard> {
                     MaterialPageRoute(
                       builder: (context) => GameMonitorScreen(
                         eventName: widget.eventName,
-                        time: timeLeft,
+                        time: (timeLeft / 60).ceil(),
                         maxParticipants: "60",
                       ),
                     ),

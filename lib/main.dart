@@ -1,5 +1,6 @@
 import 'package:amingo/providers/theme_provider.dart';
 import 'package:amingo/screens/login_screen.dart';
+// import 'package:amingo/screens/friend_verification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: HomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }

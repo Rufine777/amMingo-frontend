@@ -9,10 +9,8 @@ class EventDetails extends StatelessWidget {
   final String joinOrStart;
   final int duration;
   final String description;
-  // final String calendar_date;
-  // final String day;
-  // final String mainLocation;
-  // final String subLocation;
+  final String location;
+  final String dateHosted;
 
   const EventDetails({
     super.key,
@@ -22,10 +20,8 @@ class EventDetails extends StatelessWidget {
     required this.joinOrStart,
     required this.duration,
     required this.description,
-    // required this.calendar_date,
-    // required this.day,
-    // required this.mainLocation,
-    // required this.subLocation,
+    required this.location,
+    required this.dateHosted,
   });
 
   @override
@@ -35,13 +31,17 @@ class EventDetails extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    // sample data
     final List<EventDetail> details = [
-      // EventDetail(
-      //   icon: Icons.calendar_month,
-      //   mainDetail: calendar_date,
-      //   subDetail: day,
-      // ),
+      EventDetail(
+        icon: Icons.calendar_month,
+        mainDetail: "Date Hosted",
+        subDetail: dateHosted,
+      ),
+      EventDetail(
+        icon: Icons.location_on,
+        mainDetail: "Location",
+        subDetail: location,
+      ),
       EventDetail(
         icon: Icons.timer,
         mainDetail: "Duration",
@@ -52,17 +52,10 @@ class EventDetails extends StatelessWidget {
         mainDetail: "Description",
         subDetail: description,
       ),
-      // EventDetail(
-      //   icon: Icons.location_on,
-      //   mainDetail: "Amrita University",
-      //   subDetail: "Main Auditorium",
-      // ),
     ];
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-
-      // APP BAR
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: colorScheme.surface,
@@ -75,14 +68,12 @@ class EventDetails extends StatelessWidget {
         ),
       ),
 
-      // BODY
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                // crowd gathering image
                 Center(
                   child: SizedBox(
                     width: double.infinity,
@@ -127,11 +118,9 @@ class EventDetails extends StatelessWidget {
 
                 SizedBox(height: height * 0.03),
 
-                // EVENT TITLE & HOST DETAILS
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Event Title
                     Text(
                       eventName,
                       style: textTheme.headlineSmall?.copyWith(
@@ -142,7 +131,6 @@ class EventDetails extends StatelessWidget {
 
                     SizedBox(height: height * 0.01),
 
-                    //Host Details
                     Row(
                       children: [
                         Container(
@@ -156,7 +144,7 @@ class EventDetails extends StatelessWidget {
                           ),
                           child: ClipOval(
                             child: Image.network(
-                              hostPfp, // hostProfile img
+                              hostPfp,
                               width: 45,
                               height: 45,
                               fit: BoxFit.cover,
@@ -179,7 +167,7 @@ class EventDetails extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              hostName, // host name
+                              hostName,
                               style: textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: colorScheme.onSurface,
@@ -213,7 +201,6 @@ class EventDetails extends StatelessWidget {
         ),
       ),
 
-      // BOTTOM PLAY BUTTON
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -222,19 +209,23 @@ class EventDetails extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                if (joinOrStart == 'PLAY' || joinOrStart == 'RESUME') {
+                final action = joinOrStart.trim().toUpperCase();
+                if (action == 'PLAY' || action == 'RESUME') {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => BingoBoard(
                         eventName: eventName,
                         hostName: hostName,
-                        timelimit: duration,
+                        durationMinutes: duration,
                         description: description,
+                        location: location,
+                        dateHosted: dateHosted,
+                        hostPfp: hostPfp,
                       ),
                     ),
                   );
-                } else if (joinOrStart == 'START') {
+                } else if (action == 'START') {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -268,7 +259,6 @@ class EventDetails extends StatelessWidget {
   }
 }
 
-// CUSTOM WIDGET FOR DETAILS
 class DetailCard extends StatelessWidget {
   final IconData icon;
   final String mainDetail;
@@ -339,7 +329,6 @@ class DetailCard extends StatelessWidget {
   }
 }
 
-// Class for sample data
 class EventDetail {
   final IconData icon;
   final String mainDetail;
