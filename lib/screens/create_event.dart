@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'event_details.dart';
+
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
   @override
@@ -186,7 +188,33 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   width: double.infinity,
                   height: height * 0.07,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      if (_eventNameController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Event name is required")),
+                        );
+                        return;
+                      }
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EventDetails(
+                            eventName: _eventNameController.text,
+                            hostName: "amFOSS", //Host name fetch from backend
+                            hostPfp: 'https://i.pravatar.cc/150?img=6',
+                            joinOrStart: 'START',
+                            duration:
+                                int.tryParse(_timeLimitController.text) ?? 0,
+                            description: _descriptionController.text,
+                            // calendar_date: '',
+                            // day: '',
+                            // mainLocation: '',
+                            // subLocation: '',
+                          ),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       foregroundColor: colorScheme.onPrimary,
