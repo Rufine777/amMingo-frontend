@@ -182,7 +182,7 @@ class _EventDetailsState extends State<EventDetails> {
                               height: 45,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.person, size: 45),
+                                  const Icon(Icons.person, size: 45),
                             ),
                           ),
                         ),
@@ -241,7 +241,6 @@ class _EventDetailsState extends State<EventDetails> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               if (widget.joinOrStart == 'START') ...[
                 Text(
                   "GRID SIZE",
@@ -280,7 +279,9 @@ class _EventDetailsState extends State<EventDetails> {
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             decoration: BoxDecoration(
-                              color: isSelected ? colorScheme.primary : Colors.transparent,
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : Colors.transparent,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -290,7 +291,9 @@ class _EventDetailsState extends State<EventDetails> {
                                 fontWeight: FontWeight.bold,
                                 color: isSelected
                                     ? colorScheme.onPrimary
-                                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                    : colorScheme.onSurfaceVariant.withValues(
+                                        alpha: 0.7,
+                                      ),
                               ),
                             ),
                           ),
@@ -315,7 +318,11 @@ class _EventDetailsState extends State<EventDetails> {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     children: [
-                      Icon(Icons.people_alt_outlined, size: 20, color: colorScheme.primary),
+                      Icon(
+                        Icons.people_alt_outlined,
+                        size: 20,
+                        color: colorScheme.primary,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         "Participants Joined: ",
@@ -336,13 +343,13 @@ class _EventDetailsState extends State<EventDetails> {
               ),
               const SizedBox(height: 12),
 
-
               SizedBox(
                 height: height * 0.07,
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (widget.joinOrStart == 'PLAY' || widget.joinOrStart == 'RESUME') {
+                    if (widget.joinOrStart == 'PLAY' ||
+                        widget.joinOrStart == 'RESUME') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
