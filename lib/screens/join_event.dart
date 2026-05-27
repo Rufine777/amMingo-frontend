@@ -80,8 +80,6 @@ class _JoinEventScreenState extends State<JoinEventScreen>
           duration: 160,
           description:
               'The entry to amfoss event, join now. contribute to open source',
-          // location: 'Amrita University',
-          // dateHosted: '15 October 2026',
         ),
       ),
     );

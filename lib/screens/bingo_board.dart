@@ -38,7 +38,7 @@ class _BingoBoardState extends State<BingoBoard> {
   void initState() {
     super.initState();
 
-    timeLeft = widget.timelimit;
+    timeLeft = widget.timelimit * 60;
 
     board = generateBoard();
 

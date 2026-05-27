@@ -23,7 +23,7 @@ class EventDetails extends StatefulWidget {
     required this.duration,
     required this.description,
     this.participantCount = 0,
-    this.initialGridSize = '4 x 4',
+    this.initialGridSize = '5 x 5',
     this.onGridSizeChanged,
   });
 
@@ -419,15 +419,19 @@ class DetailCard extends StatelessWidget {
     return Container(
       width: width * 0.9,
       padding: const EdgeInsets.all(20),
+
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
       ),
+
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: colorScheme.primary, size: 36),
+
           SizedBox(width: width * 0.04),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -442,7 +446,9 @@ class DetailCard extends StatelessWidget {
                     color: colorScheme.onSurface,
                   ),
                 ),
+
                 const SizedBox(height: 6),
+
                 Flexible(
                   child: Text(
                     subDetail,

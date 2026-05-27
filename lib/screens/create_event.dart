@@ -207,10 +207,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             duration:
                                 int.tryParse(_timeLimitController.text) ?? 0,
                             description: _descriptionController.text,
-                            // calendar_date: '',
-                            // day: '',
-                            // mainLocation: '',
-                            // subLocation: '',
                           ),
                         ),
                       );
