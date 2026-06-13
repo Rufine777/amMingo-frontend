@@ -317,7 +317,6 @@ class _EventDetailsState extends State<EventDetails> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.people_alt_outlined,

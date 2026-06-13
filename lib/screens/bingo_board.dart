@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:amingo/screens/event_details.dart';
+import 'package:amingo/screens/profile_section.dart';
 import 'package:flutter/material.dart';
 import 'bingo_tile.dart';
 import 'friend_verification.dart';
@@ -188,7 +189,14 @@ class _BingoBoardState extends State<BingoBoard> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LeaderboardScreen(),
+                        builder: (context) => ProfileSection(
+                          userName: 'SpiderMan',
+                          userHandle: 'suiiiiiiiiii@321',
+                          userPfp: 'https://i.pravatar.cc/150?img=6',
+                          email: 'suiiii@gmail.com',
+                          bio:
+                              'full stack developer // open source enthusiasts // hiii there ',
+                        ),
                       ),
                     ); // to be navigated to the profile page
                   },
