@@ -76,12 +76,10 @@ class _JoinEventScreenState extends State<JoinEventScreen>
           eventName: 'amFOSS Praveshan 2026',
           hostName: 'amFOSS',
           hostPfp: 'https://i.pravatar.cc/150?img=6',
-          joinOrStart: 'Play',
+          joinOrStart: 'PLAY',
           duration: 160,
           description:
               'The entry to amfoss event, join now. contribute to open source',
-          location: 'Amrita University',
-          dateHosted: '15 October 2026',
         ),
       ),
     );

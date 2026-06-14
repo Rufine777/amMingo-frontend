@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'game_monitor.dart';
+import 'event_details.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -223,17 +222,35 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   height: height * 0.07,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_eventNameController.text.isNotEmpty &&
-                          _timeLimitController.text.isNotEmpty &&
+                      if (_eventNameController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Event name is required"),
+                          ),
+                        );
+                        return;
+                      }
+                      if (_timeLimitController.text.isNotEmpty &&
                           _participantsController.text.isNotEmpty) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => GameMonitorScreen(
+                            builder: (context) => EventDetails(
                               eventName: _eventNameController.text,
-                              time: int.parse(_timeLimitController.text),
-                              maxParticipants: _participantsController.text,
+                              hostName:
+                                  "amFOSS", // Host name fetch from backend
+                              hostPfp: 'https://i.pravatar.cc/150?img=6',
+                              joinOrStart: 'START',
+                              duration:
+                                  int.tryParse(_timeLimitController.text) ?? 0,
+                              description: _descriptionController.text,
                             ),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please fill in all required fields"),
                           ),
                         );
                       }
