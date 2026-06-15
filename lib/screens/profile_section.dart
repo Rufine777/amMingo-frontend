@@ -9,7 +9,7 @@ class ProfileSection extends StatefulWidget {
   final String bio;
   final int gamesPlayed;
   final int totalWins;
-  final String actionType; // 'EDIT PROFILE' or 'SIGN OUT'
+  final String actionType;
 
   final Function()? onActionPressed;
 
