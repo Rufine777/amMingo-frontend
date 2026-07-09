@@ -225,46 +225,46 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   height: height * 0.07,
                   child: ElevatedButton(
                     onPressed: () async {
-                      final response = await _authService.createGame(
-                        description: _descriptionController.text,
-                        location: _locationController.text,
-                        duration: int.parse(_timeLimitController.text),
-                      );
-
-                      final joinCode = response.data["join_code"];
-                      final gameId = response.data["game_id"];
-                      final qrImage = response.data["qr_img"];
                       if (_eventNameController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Event name is required"),
-                          ),
+                          const SnackBar(content: Text("Event name is required")),
                         );
                         return;
                       }
                       if (_timeLimitController.text.isEmpty ||
                           _participantsController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Please fill in all required fields"),
-                          ),
+                          const SnackBar(content: Text("Please fill in all required fields")),
                         );
                         return;
                       }
+
                       try {
-                        await _authService.createGame(
-                          description: _descriptionController.text,
+                        // Fetch host profile first
+                        final profileResponse = await _authService.getProfile(0);
+                        final String hostName = profileResponse.data["name"] ?? "Host";
+                        final String? pfp = profileResponse.data["profile_image"];
+                        final String hostPfp = (pfp != null && pfp.isNotEmpty)
+                            ? (pfp.startsWith('http') ? pfp : "${AuthService.baseUrl}${pfp.startsWith('/') ? '' : '/'}$pfp")
+                            : "https://i.pravatar.cc/150?img=6";
+
+                        final response = await _authService.createGame(
+                          description: "${_eventNameController.text}|${_descriptionController.text}",
                           location: _locationController.text,
                           duration: int.parse(_timeLimitController.text),
                         );
+
+                        final String joinCode = response.data["join_code"] ?? "";
+                        final String qrImage = response.data["qr_img"] ?? "";
+
                         if (!mounted) return;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => EventDetails(
                               eventName: _eventNameController.text,
-                              hostName: "amFOSS",
-                              hostPfp: "https://i.pravatar.cc/150?img=6",
+                              hostName: hostName,
+                              hostPfp: hostPfp,
                               joinOrStart: "START",
                               duration: int.parse(_timeLimitController.text),
                               description: _descriptionController.text,

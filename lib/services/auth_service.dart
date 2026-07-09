@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:cookie_jar/cookie_jar.dart';
@@ -11,7 +10,7 @@ class AuthService {
   static final CookieJar _cookieJar = CookieJar();
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "http://127.0.0.1:8000/api",
+      baseUrl: "$baseUrl/api",
       headers: {
         "Content-Type": "application/json",
       },
@@ -45,14 +44,16 @@ class AuthService {
   }
 
   Future<Response> verifyOtp(String email, String otp) async {
-    return await _dio.post(
+    final response = await _dio.post(
       "/login/verify-otp",
       data: {
         "email": email,
         "otp": otp,
       },
     );
+    return response;
   }
+
 
   Future<Response> joinGame(String code) async {
     final token = await _storage.read(key: "access_token");
@@ -120,11 +121,7 @@ class AuthService {
   }) async {
     final token = await _storage.read(key: "access_token");
 
-    print("Token: $token");
-
     _dio.options.headers["Cookie"] = "access_token=$token";
-
-    print(_dio.options.headers);
 
     return await _dio.post(
       "/games",
@@ -179,19 +176,17 @@ class AuthService {
     _dio.options.headers["Cookie"] = "access_token=$token";
 
     final formData = FormData.fromMap({
+      "bingo_id": bingoId,
+      "row": row,
+      "col": col,
+      "friend_name": friendName,
+      "friend_code": friendCode,
+      "fact": fact,
       "image": await MultipartFile.fromFile(image.path),
     });
 
     return await _dio.post(
       "/games/tile-submit",
-      queryParameters: {
-        "bingo_id": bingoId,
-        "row": row,
-        "col": col,
-        "friend_name": friendName,
-        "friend_code": friendCode,
-        "fact": fact,
-      },
       data: formData,
     );
   }

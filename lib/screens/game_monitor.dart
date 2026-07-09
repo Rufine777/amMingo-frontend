@@ -51,8 +51,8 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
       }
     });
 
-    // Fetch status every 5 seconds and sync time
-    statusTimer = Timer.periodic(const Duration(seconds: 5), (_) => _fetchStatus());
+    // Fetch status every 10 seconds and sync time
+    statusTimer = Timer.periodic(const Duration(seconds: 10), (_) => _fetchStatus());
   }
 
   Future<void> _fetchStatus() async {

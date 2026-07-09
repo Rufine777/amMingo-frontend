@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:amingo/screens/event_details.dart';
 import 'package:amingo/services/auth_service.dart';
 import 'package:amingo/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -98,18 +97,16 @@ class _BingoBoardState extends State<BingoBoard> {
         setState(() {
           bingoId = data['bingo_id'];
           score = data['points'];
+          
+          boardSize = (tilesData.length == 9) ? 3 : (tilesData.length == 16) ? 4 : 5;
+          
           board = tilesData.map((t) {
-            String char = t['bingo_char'] ?? "?";
-            if (char == "T") {
-               // Assign stable letters A-Y based on position if generic T is found
-               int index = (t['row'] ?? 0) * boardSize + (t['col'] ?? 0);
-               char = String.fromCharCode(65 + (index % 25));
-            }
+            String char = (t['bingo_char'] ?? "?").toString().trim().toUpperCase();
             return BingoCell(
               letter: char,
               isMarked: t['image_url'] != null,
-              row: t['row'],
-              col: t['col'],
+              row: t['row'] ?? 0,
+              col: t['col'] ?? 0,
             );
           }).toList();
           
@@ -117,7 +114,6 @@ class _BingoBoardState extends State<BingoBoard> {
             endTime = DateTime.parse(gameData['end_time']).toUtc();
           }
 
-          boardSize = (board.length == 9) ? 3 : (board.length == 16) ? 4 : 5;
           checkedTiles = board.where((c) => c.isMarked).length;
           isLoading = false;
         });

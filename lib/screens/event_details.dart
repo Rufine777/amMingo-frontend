@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:amingo/services/auth_service.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'bingo_board.dart';
 import 'game_monitor.dart';
@@ -69,30 +69,39 @@ class _EventDetailsState extends State<EventDetails> {
     try {
       final lobbyResponse = await AuthService().getLobby(widget.joinCode);
       final gameResponse = await AuthService().getGameDetails(widget.joinCode);
-      
-      if (mounted) {
-        final game = gameResponse.data;
-        setState(() {
-          _currentParticipantCount = lobbyResponse.data['player_count'] ?? _currentParticipantCount;
-          _currentHostName = game['host_name'] ?? _currentHostName;
-          _gameStarted = game['board_size'] != null;
-          
-          final String rawDesc = game['description'] ?? "";
-          if (rawDesc.contains('|')) {
-            var parts = rawDesc.split('|');
-            _currentEventName = parts[0];
-            _currentDescription = parts[1];
-          } else {
-            _currentEventName = rawDesc.isNotEmpty ? rawDesc : "SOCIAL BINGO";
-            _currentDescription = "";
-          }
 
-          if (game['host_pfp'] != null) {
-            _currentHostPfp = game['host_pfp'].startsWith('http') 
-                ? game['host_pfp'] 
-                : "${AuthService.baseUrl}${game['host_pfp']}";
-          }
-        });
+      if (mounted) {
+          final game = gameResponse.data;
+          setState(() {
+            _currentParticipantCount = lobbyResponse.data['player_count'] ?? _currentParticipantCount;
+
+            final String? hostName = game['host_name'];
+            if (hostName != null && hostName.isNotEmpty) {
+              _currentHostName = hostName;
+            } else {
+              // Final fallback to the widget's initial name if API returns nothing
+              _currentHostName = _currentHostName.isEmpty ? widget.hostName : _currentHostName;
+            }
+
+            _gameStarted = game['board_size'] != null;
+
+            final String rawDesc = game['description'] ?? "";
+            if (rawDesc.contains('|')) {
+              var parts = rawDesc.split('|');
+              _currentEventName = parts[0].trim();
+              _currentDescription = parts[1].trim();
+            } else if (rawDesc.isNotEmpty) {
+              _currentEventName = rawDesc;
+              _currentDescription = "";
+            }
+
+            if (game['host_pfp'] != null) {
+              String pfpPath = game['host_pfp'];
+              _currentHostPfp = pfpPath.startsWith('http')
+                  ? pfpPath
+                  : "${AuthService.baseUrl}${pfpPath.startsWith('/') ? '' : '/'}$pfpPath";
+            }
+          });
       }
     } catch (e) {
       debugPrint("Error fetching event data: $e");
@@ -115,20 +124,6 @@ class _EventDetailsState extends State<EventDetails> {
     }
   }
 
-  void _showComingSoonMessage(BuildContext context) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          "Coming soon",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -257,7 +252,7 @@ class _EventDetailsState extends State<EventDetails> {
                 radius: 22,
                 backgroundImage: NetworkImage(_currentHostPfp),
                 backgroundColor: cs.surfaceContainer,
-                onBackgroundImageError: (_, __) {},
+                onBackgroundImageError: (exception, stackTrace) {},
                 child: _currentHostPfp.isEmpty ? const Icon(Icons.person) : null,
               ),
             ),
@@ -289,7 +284,7 @@ class _EventDetailsState extends State<EventDetails> {
               width: 200,
               height: 200,
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Icon(Icons.qr_code_2_rounded, size: 200),
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.qr_code_2_rounded, size: 200),
             ),
           )
         else
@@ -388,10 +383,10 @@ class _EventDetailsState extends State<EventDetails> {
               MaterialPageRoute(
                 builder: (context) => BingoBoard(
                   joinCode: widget.joinCode,
-                  eventName: widget.eventName,
-                  hostName: widget.hostName,
+                  eventName: _currentEventName,
+                  hostName: _currentHostName,
                   timelimit: widget.duration,
-                  description: widget.description,
+                  description: _currentDescription,
                 ),
               ),
             );
@@ -412,7 +407,12 @@ class _EventDetailsState extends State<EventDetails> {
                 ),
               );
             } catch (e) {
-              if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to start game: $e")));
+              String errorMsg = "Failed to start game: $e";
+              if (e is DioException && e.response?.data is Map) {
+                final detail = e.response!.data['detail'];
+                if (detail != null) errorMsg = detail.toString();
+              }
+              if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMsg)));
             }
           }
         },

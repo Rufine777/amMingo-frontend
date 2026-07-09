@@ -1,13 +1,23 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:amingo/screens/preview_screen.dart';
-import 'package:amingo/screens/role_selection.dart';
+import 'package:amingo/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class FriendVerification extends StatefulWidget {
   final String letter;
+  final int bingoId;
+  final int row;
+  final int col;
 
-  const FriendVerification({super.key, required this.letter});
+  const FriendVerification({
+    super.key,
+    required this.letter,
+    required this.bingoId,
+    required this.row,
+    required this.col,
+  });
 
   @override
   State<FriendVerification> createState() => _FriendVerificationState();
@@ -20,6 +30,40 @@ class _FriendVerificationState extends State<FriendVerification> {
 
   File? image;
   final ImagePicker picker = ImagePicker();
+  bool isSubmitting = false;
+  String myCode = "...";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMyCode();
+  }
+
+  Future<void> _fetchMyCode() async {
+    try {
+      String? storedCode = await AuthService.getUserCode();
+      if (storedCode != null && mounted) {
+        setState(() {
+          myCode = storedCode;
+        });
+        return;
+      }
+
+      final response = await AuthService().getProfile(0);
+      final data = response.data;
+      if (mounted) {
+        String fetchedCode = data['code'] ?? "000000";
+        setState(() {
+          myCode = fetchedCode;
+        });
+        if (fetchedCode != "000000") {
+          await AuthService.saveUserCode(fetchedCode);
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching user code: $e");
+    }
+  }
 
   Future<void> _openCamera() async {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
@@ -39,6 +83,57 @@ class _FriendVerificationState extends State<FriendVerification> {
       setState(() {
         image = File(pickedFile.path);
       });
+    }
+  }
+
+  Future<void> _submitVerification() async {
+    if (image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please take a photo first")),
+      );
+      return;
+    }
+    if (nameController.text.isEmpty || codeController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill in friend's name and code")),
+      );
+      return;
+    }
+
+    setState(() => isSubmitting = true);
+
+    try {
+      await AuthService().submitTile(
+        bingoId: widget.bingoId,
+        row: widget.row,
+        col: widget.col,
+        friendName: nameController.text.trim(),
+        friendCode: codeController.text.trim(),
+        fact: aboutController.text.trim(),
+        image: image!,
+      );
+
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      debugPrint("Error submitting verification: $e");
+      String errorMessage = e.toString();
+      if (e is DioException && e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map && data.containsKey('detail')) {
+          errorMessage = data['detail'].toString();
+        }
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Verification failed: $errorMessage")),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isSubmitting = false);
+      }
     }
   }
 
@@ -204,10 +299,11 @@ class _FriendVerificationState extends State<FriendVerification> {
               controller: codeController,
               cursorColor: colorScheme.primary,
               style: TextStyle(color: colorScheme.onSurface),
-              keyboardType: TextInputType.number,
-              maxLength: 3,
+              keyboardType: TextInputType.text,
+              maxLength: 6,
+              textCapitalization: TextCapitalization.characters,
               decoration: InputDecoration(
-                hintText: "e.g. 123",
+                hintText: "e.g. A1B2C3",
                 hintStyle: TextStyle(
                   color: colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
@@ -229,49 +325,19 @@ class _FriendVerificationState extends State<FriendVerification> {
               ),
             ),
             const SizedBox(height: 8),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    "Ask your friend for their 3-digit code to verify.",
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: colorScheme.outline),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Your Code: ",
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "867",
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            Text(
+              "Ask your friend for their 6-character code to verify.",
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Check profile to see your code.",
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.tertiary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
 
             const SizedBox(height: 24),
@@ -326,25 +392,22 @@ class _FriendVerificationState extends State<FriendVerification> {
             height: height * 0.09,
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Roleselection()),
-                );
-              },
+              onPressed: isSubmitting ? null : _submitVerification,
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: Text(
-                "VERIFY AND MARK TILE",
-                style: textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.surface,
-                ),
-              ),
+              child: isSubmitting
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text(
+                      "VERIFY AND MARK TILE",
+                      style: textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.surface,
+                      ),
+                    ),
             ),
           ),
         ),

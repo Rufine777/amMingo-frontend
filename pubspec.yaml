@@ -79,6 +79,7 @@ flutter:
     - assets/images/google-removebg-preview.png
     - assets/images/amMingo.png
     - assets/images/crowd_gathering.png
+    - assets/images/default2.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

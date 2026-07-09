@@ -68,6 +68,11 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       final lobbyResponse = await auth.getLobby(code);
       final gameResponse = await auth.getGameDetails(code);
       final game = gameResponse.data;
+      print("Current game details:");
+      print(game);
+
+      print("Host name from API: ${game["host_name"]}");
+      print("Host id from API: ${game["host_id"]}");
       if (!mounted) return;
       final startTime = DateTime.parse(game["start_time"]);
       final endTime = DateTime.parse(game["end_time"]);
@@ -79,8 +84,8 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       String description = "";
       if (rawDesc.contains('|')) {
         var parts = rawDesc.split('|');
-        eventName = parts[0];
-        description = parts[1];
+        eventName = parts[0].trim();
+        description = parts[1].trim();
       } else {
         eventName = rawDesc.isNotEmpty ? rawDesc : "SOCIAL BINGO";
       }
