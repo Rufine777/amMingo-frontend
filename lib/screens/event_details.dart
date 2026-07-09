@@ -383,8 +383,9 @@ class _EventDetailsState extends State<EventDetails> {
                 child: GestureDetector(
                   onTap: () {
                     setState(() => _selectedGridSize = sizeLabel);
-                    if (widget.onGridSizeChanged != null)
+                    if (widget.onGridSizeChanged != null) {
                       widget.onGridSizeChanged!(sizeLabel);
+                    }
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
@@ -486,10 +487,11 @@ class _EventDetailsState extends State<EventDetails> {
                 final detail = e.response!.data['detail'];
                 if (detail != null) errorMsg = detail.toString();
               }
-              if (mounted)
+              if (context.mounted) {
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(SnackBar(content: Text(errorMsg)));
+              }
             }
           }
         },

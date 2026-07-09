@@ -22,10 +22,19 @@ class AuthService {
   static const String baseUrl = "http://localhost:8000";
 
   Future<void> sendOtp(String email) async {
-    await _dio.post(
-      "/login/send-otp",
-      data: {"email": email},
-    );
+    await _dio.post("/login/email", data: {"email": email});
+  }
+
+  static Future<void> saveToken(String token) async {
+    await _storage.write(key: "access_token", value: token);
+  }
+
+  static Future<void> saveUserCode(String code) async {
+    await _storage.write(key: "user_code", value: code);
+  }
+
+  static Future<String?> getUserCode() async {
+    return await _storage.read(key: "user_code");
   }
 
   Future<void> resendOtp(String email) async {
@@ -33,10 +42,11 @@ class AuthService {
   }
 
   Future<Response> verifyOtp(String email, String otp) async {
-    return await _dio.post(
+    final response = await _dio.post(
       "/login/verify-otp",
       data: {"email": email, "otp": otp},
     );
+    return response;
   }
 
   Future<Response> joinGame(String code) async {
@@ -59,16 +69,28 @@ class AuthService {
     return await _dio.get("/profile/$id");
   }
 
-  Future<Response> updateProfile({required String name, required String email}) async {
+  Future<Response> updateProfile({String? name, String? username}) async {
     final token = await _storage.read(key: "access_token");
     _dio.options.headers["Cookie"] = "access_token=$token";
-    return await _dio.patch(
-      "/profile",
-      data: {
-        "name": name,
-        "email": email,
-      },
-    );
+    final data = <String, dynamic>{};
+    if (name != null) data["name"] = name;
+    if (username != null) data["username"] = username;
+    return await _dio.patch("/profile/me", data: data);
+  }
+
+  Future<Response> uploadProfileImage(String path) async {
+    final token = await _storage.read(key: "access_token");
+    _dio.options.headers["Cookie"] = "access_token=$token";
+    final formData = FormData.fromMap({
+      "file": await MultipartFile.fromFile(path),
+    });
+    return await _dio.post("/profile/upload", data: formData);
+  }
+
+  Future<void> logout() async {
+    await _storage.delete(key: "access_token");
+    await _storage.delete(key: "user_code");
+    _cookieJar.deleteAll();
   }
 
   Future<String?> signInWithGoogle() async {
@@ -155,22 +177,5 @@ class AuthService {
     });
 
     return await _dio.post("/games/tile-submit", data: formData);
-  }
-
-  static Future<void> saveToken(String token) async {
-    await _storage.write(key: "access_token", value: token);
-  }
-
-  static Future<void> saveUserCode(String code) async {
-    await _storage.write(key: "user_code", value: code);
-  }
-
-  static Future<String?> getUserCode() async {
-    return await _storage.read(key: "user_code");
-  }
-
-  static Future<void> clearAuth() async {
-    await _storage.delete(key: "access_token");
-    await _storage.delete(key: "user_code");
   }
 }
