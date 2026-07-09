@@ -1,0 +1,56 @@
+name: "⭐ Feature Request"
+description: Suggest an idea or improvement for the Human Bingo mobile app.
+title: "[Feature]: "
+labels: ["enhancement"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting improvements to **Human Bingo**
+
+        Before creating a feature request:
+        - Please search existing issues to avoid duplicates.
+        - Describe one feature per issue.
+        - Focus on the problem you want solved rather than a specific implementation.
+
+  - type: textarea
+    attributes:
+      label: Problem Statement
+      description: What user problem or opportunity should be addressed?
+      placeholder: It is difficult for participants to track how close they are to completing a bingo row.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Why is this important?
+      description: Why does this problem matter? How does it impact users or event hosts?
+      placeholder: Participants lose engagement when they cannot easily track progress.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Who will benefit?
+      description: Which users benefit from this feature? (Host, Participant, or both?)
+      placeholder: Participants during large networking events.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Proposed Idea (Optional)
+      description: If you have a possible solution in mind, describe it here.
+      placeholder: Add a visual progress indicator or highlight near-complete rows.
+    validations:
+      required: false
+
+  - type: dropdown
+    attributes:
+      label: Would you like to work on this feature?
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: false

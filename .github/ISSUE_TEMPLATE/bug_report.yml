@@ -1,0 +1,96 @@
+name: "🐞 Bug Report"
+description: Report a problem in the Human Bingo mobile app.
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve **Human Bingo**
+
+        Before creating a new issue:
+        - Please search existing issues to avoid duplicates.
+
+  - type: textarea
+    attributes:
+      label: Summary
+      description: Briefly describe the issue. What is going wrong?
+      placeholder: The selfie verification fails even after entering the correct participant code.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Open the Human Bingo app
+        2. Join an event using QR code
+        3. Capture a selfie with another participant
+        4. Enter their verification code
+        5. Tap Submit
+        6. Observe the error
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behaviour
+      description: What should have happened?
+      placeholder: The interaction should be verified and points should be awarded.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Actual Behaviour
+      description: What actually happened?
+      placeholder: The app shows "Invalid Code" even though the code is correct.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Device Information
+
+  - type: input
+    attributes:
+      label: Device Model
+      description: What device are you using?
+      placeholder: OnePlus 11 / Samsung Galaxy S22 / Pixel 7
+    validations:
+      required: false
+
+  - type: input
+    attributes:
+      label: OS Version
+      description: What version of Android or iOS are you running?
+      placeholder: Android 14 / iOS 17
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Logs (Optional)
+      description: If possible, include logs or error messages from the console or crash report.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Screenshots or Screen Recording (Optional)
+      description: Add screenshots or recordings showing the issue.
+    validations:
+      required: false
+
+  - type: dropdown
+    attributes:
+      label: Would you like to work on this issue?
+      description: Let us know if you would like to fix this bug.
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: false
