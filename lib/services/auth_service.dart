@@ -3,6 +3,7 @@ import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   static const _storage = FlutterSecureStorage();
@@ -21,19 +22,10 @@ class AuthService {
   static const String baseUrl = "http://localhost:8000";
 
   Future<void> sendOtp(String email) async {
-    await _dio.post("/login/email", data: {"email": email});
-  }
-
-  static Future<void> saveToken(String token) async {
-    await _storage.write(key: "access_token", value: token);
-  }
-
-  static Future<void> saveUserCode(String code) async {
-    await _storage.write(key: "user_code", value: code);
-  }
-
-  static Future<String?> getUserCode() async {
-    return await _storage.read(key: "user_code");
+    await _dio.post(
+      "/login/send-otp",
+      data: {"email": email},
+    );
   }
 
   Future<void> resendOtp(String email) async {
@@ -41,11 +33,10 @@ class AuthService {
   }
 
   Future<Response> verifyOtp(String email, String otp) async {
-    final response = await _dio.post(
+    return await _dio.post(
       "/login/verify-otp",
       data: {"email": email, "otp": otp},
     );
-    return response;
   }
 
   Future<Response> joinGame(String code) async {
@@ -68,28 +59,16 @@ class AuthService {
     return await _dio.get("/profile/$id");
   }
 
-  Future<Response> updateProfile({String? name, String? username}) async {
+  Future<Response> updateProfile({required String name, required String email}) async {
     final token = await _storage.read(key: "access_token");
     _dio.options.headers["Cookie"] = "access_token=$token";
-    final data = <String, dynamic>{};
-    if (name != null) data["name"] = name;
-    if (username != null) data["username"] = username;
-    return await _dio.patch("/profile/me", data: data);
-  }
-
-  Future<Response> uploadProfileImage(String path) async {
-    final token = await _storage.read(key: "access_token");
-    _dio.options.headers["Cookie"] = "access_token=$token";
-    final formData = FormData.fromMap({
-      "file": await MultipartFile.fromFile(path),
-    });
-    return await _dio.post("/profile/upload", data: formData);
-  }
-
-  Future<void> logout() async {
-    await _storage.delete(key: "access_token");
-    await _storage.delete(key: "user_code");
-    _cookieJar.deleteAll();
+    return await _dio.patch(
+      "/profile",
+      data: {
+        "name": name,
+        "email": email,
+      },
+    );
   }
 
   Future<String?> signInWithGoogle() async {
@@ -128,7 +107,14 @@ class AuthService {
     final token = await _storage.read(key: "access_token");
     _dio.options.headers["Cookie"] = "access_token=$token";
 
-    return await _dio.post("/games/$code/start", data: {"size": size});
+    try {
+      return await _dio.post("/games/$code/start", data: {"size": size});
+    } on DioException catch (e) {
+      debugPrint("STATUS: ${e.response?.statusCode}");
+      debugPrint("BODY: ${e.response?.data}");
+      debugPrint("URI: ${e.requestOptions.uri}");
+      rethrow;
+    }
   }
 
   Future<Response> getBoard(String code) async {
@@ -169,5 +155,22 @@ class AuthService {
     });
 
     return await _dio.post("/games/tile-submit", data: formData);
+  }
+
+  static Future<void> saveToken(String token) async {
+    await _storage.write(key: "access_token", value: token);
+  }
+
+  static Future<void> saveUserCode(String code) async {
+    await _storage.write(key: "user_code", value: code);
+  }
+
+  static Future<String?> getUserCode() async {
+    return await _storage.read(key: "user_code");
+  }
+
+  static Future<void> clearAuth() async {
+    await _storage.delete(key: "access_token");
+    await _storage.delete(key: "user_code");
   }
 }
