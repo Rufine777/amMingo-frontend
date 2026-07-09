@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'styles/theme_data.dart';
-import 'package:amingo/services/auth_service.dart';
 import 'package:amingo/screens/enter_username.dart';
 
 bool validateEmail(String email) {
@@ -187,6 +186,7 @@ class _EmailInputState extends State<HomeScreen> {
                           try {
                             await AuthService().sendOtp(email);
 
+                            if (!context.mounted) return;
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -196,6 +196,7 @@ class _EmailInputState extends State<HomeScreen> {
                           } catch (e) {
                             debugPrint(e.toString());
 
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(e.toString())),
                             );
@@ -257,15 +258,14 @@ class _EmailInputState extends State<HomeScreen> {
                         final authService = AuthService();
                         final token = await authService.signInWithGoogle();
                         if (token != null) {
-                          await AuthService.saveToken(token);             
-                          print("Got token: $token");
+                          await AuthService.saveToken(token);
+                          debugPrint("Got token: $token");
                           if (!context.mounted) return;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const CreateUsername(),
                             ),
-                            
                           );
                         }
                       },

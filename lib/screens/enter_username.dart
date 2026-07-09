@@ -24,9 +24,9 @@ class _CreateUsernameState extends State<CreateUsername> {
   Future<void> _saveProfile() async {
     final name = nameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter your name")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please enter your name")));
       return;
     }
 
@@ -36,16 +36,14 @@ class _CreateUsernameState extends State<CreateUsername> {
       if (mounted) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const Roleselection(),
-          ),
+          MaterialPageRoute(builder: (context) => const Roleselection()),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to save profile: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Failed to save profile: $e")));
       }
     } finally {
       if (mounted) setState(() => isLoading = false);

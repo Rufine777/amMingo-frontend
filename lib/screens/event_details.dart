@@ -61,7 +61,10 @@ class _EventDetailsState extends State<EventDetails> {
   }
 
   void _startPolling() {
-    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) => _fetchEventData());
+    _refreshTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _fetchEventData(),
+    );
   }
 
   Future<void> _fetchEventData() async {
@@ -71,37 +74,40 @@ class _EventDetailsState extends State<EventDetails> {
       final gameResponse = await AuthService().getGameDetails(widget.joinCode);
 
       if (mounted) {
-          final game = gameResponse.data;
-          setState(() {
-            _currentParticipantCount = lobbyResponse.data['player_count'] ?? _currentParticipantCount;
+        final game = gameResponse.data;
+        setState(() {
+          _currentParticipantCount =
+              lobbyResponse.data['player_count'] ?? _currentParticipantCount;
 
-            final String? hostName = game['host_name'];
-            if (hostName != null && hostName.isNotEmpty) {
-              _currentHostName = hostName;
-            } else {
-              // Final fallback to the widget's initial name if API returns nothing
-              _currentHostName = _currentHostName.isEmpty ? widget.hostName : _currentHostName;
-            }
+          final String? hostName = game['host_name'];
+          if (hostName != null && hostName.isNotEmpty) {
+            _currentHostName = hostName;
+          } else {
+            // Final fallback to the widget's initial name if API returns nothing
+            _currentHostName = _currentHostName.isEmpty
+                ? widget.hostName
+                : _currentHostName;
+          }
 
-            _gameStarted = game['board_size'] != null;
+          _gameStarted = game['board_size'] != null;
 
-            final String rawDesc = game['description'] ?? "";
-            if (rawDesc.contains('|')) {
-              var parts = rawDesc.split('|');
-              _currentEventName = parts[0].trim();
-              _currentDescription = parts[1].trim();
-            } else if (rawDesc.isNotEmpty) {
-              _currentEventName = rawDesc;
-              _currentDescription = "";
-            }
+          final String rawDesc = game['description'] ?? "";
+          if (rawDesc.contains('|')) {
+            var parts = rawDesc.split('|');
+            _currentEventName = parts[0].trim();
+            _currentDescription = parts[1].trim();
+          } else if (rawDesc.isNotEmpty) {
+            _currentEventName = rawDesc;
+            _currentDescription = "";
+          }
 
-            if (game['host_pfp'] != null) {
-              String pfpPath = game['host_pfp'];
-              _currentHostPfp = pfpPath.startsWith('http')
-                  ? pfpPath
-                  : "${AuthService.baseUrl}${pfpPath.startsWith('/') ? '' : '/'}$pfpPath";
-            }
-          });
+          if (game['host_pfp'] != null) {
+            String pfpPath = game['host_pfp'];
+            _currentHostPfp = pfpPath.startsWith('http')
+                ? pfpPath
+                : "${AuthService.baseUrl}${pfpPath.startsWith('/') ? '' : '/'}$pfpPath";
+          }
+        });
       }
     } catch (e) {
       debugPrint("Error fetching event data: $e");
@@ -123,7 +129,6 @@ class _EventDetailsState extends State<EventDetails> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -177,15 +182,18 @@ class _EventDetailsState extends State<EventDetails> {
                     const SizedBox(height: 24),
                     _buildHostHeader(textTheme, colorScheme, size),
                     const SizedBox(height: 24),
-                    ...details.map((item) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: DetailCard(
-                        icon: item.icon,
-                        mainDetail: item.mainDetail,
-                        subDetail: item.subDetail,
+                    ...details.map(
+                      (item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: DetailCard(
+                          icon: item.icon,
+                          mainDetail: item.mainDetail,
+                          subDetail: item.subDetail,
+                        ),
                       ),
-                    )),
-                    if (widget.joinOrStart == "START") _buildQRCodeSection(textTheme, size),
+                    ),
+                    if (widget.joinOrStart == "START")
+                      _buildQRCodeSection(textTheme, size),
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -222,7 +230,10 @@ class _EventDetailsState extends State<EventDetails> {
               ),
               child: Text(
                 "SOCIAL BINGO",
-                style: tt.labelSmall?.copyWith(color: cs.onPrimary, fontWeight: FontWeight.bold),
+                style: tt.labelSmall?.copyWith(
+                  color: cs.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -237,7 +248,10 @@ class _EventDetailsState extends State<EventDetails> {
       children: [
         Text(
           _currentEventName,
-          style: tt.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: cs.onSurface),
+          style: tt.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: cs.onSurface,
+          ),
         ),
         const SizedBox(height: 12),
         Row(
@@ -253,15 +267,27 @@ class _EventDetailsState extends State<EventDetails> {
                 backgroundImage: NetworkImage(_currentHostPfp),
                 backgroundColor: cs.surfaceContainer,
                 onBackgroundImageError: (exception, stackTrace) {},
-                child: _currentHostPfp.isEmpty ? const Icon(Icons.person) : null,
+                child: _currentHostPfp.isEmpty
+                    ? const Icon(Icons.person)
+                    : null,
               ),
             ),
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("HOSTED BY", style: tt.labelSmall?.copyWith(color: cs.primary, letterSpacing: 1, fontWeight: FontWeight.bold)),
-                Text(_currentHostName, style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  "HOSTED BY",
+                  style: tt.labelSmall?.copyWith(
+                    color: cs.primary,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  _currentHostName,
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ],
@@ -274,7 +300,10 @@ class _EventDetailsState extends State<EventDetails> {
     return Column(
       children: [
         const SizedBox(height: 24),
-        Text("QR Code", style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          "QR Code",
+          style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 16),
         if (widget.qrImage.isNotEmpty)
           ClipRRect(
@@ -284,7 +313,8 @@ class _EventDetailsState extends State<EventDetails> {
               width: 200,
               height: 200,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.qr_code_2_rounded, size: 200),
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.qr_code_2_rounded, size: 200),
             ),
           )
         else
@@ -292,7 +322,10 @@ class _EventDetailsState extends State<EventDetails> {
         const SizedBox(height: 12),
         SelectableText(
           widget.joinCode,
-          style: tt.titleLarge?.copyWith(fontWeight: FontWeight.bold, letterSpacing: 4),
+          style: tt.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 4,
+          ),
         ),
       ],
     );
@@ -303,12 +336,19 @@ class _EventDetailsState extends State<EventDetails> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cs.surface,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -5))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.joinOrStart == 'START') _buildGridSizeSelector(cs, tt, size),
+          if (widget.joinOrStart == 'START')
+            _buildGridSizeSelector(cs, tt, size),
           _buildParticipantCount(cs, tt),
           const SizedBox(height: 16),
           _buildActionButton(cs, tt, size),
@@ -321,11 +361,21 @@ class _EventDetailsState extends State<EventDetails> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("GRID SIZE", style: tt.labelSmall?.copyWith(color: cs.primary, fontWeight: FontWeight.bold, letterSpacing: 1)),
+        Text(
+          "GRID SIZE",
+          style: tt.labelSmall?.copyWith(
+            color: cs.primary,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Row(
             children: ['3 x 3', '4 x 4', '5 x 5'].map((sizeLabel) {
               final isSelected = _selectedGridSize == sizeLabel;
@@ -333,16 +383,23 @@ class _EventDetailsState extends State<EventDetails> {
                 child: GestureDetector(
                   onTap: () {
                     setState(() => _selectedGridSize = sizeLabel);
-                    if (widget.onGridSizeChanged != null) widget.onGridSizeChanged!(sizeLabel);
+                    if (widget.onGridSizeChanged != null)
+                      widget.onGridSizeChanged!(sizeLabel);
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(color: isSelected ? cs.primary : Colors.transparent, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(
+                      color: isSelected ? cs.primary : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Text(
                       sizeLabel,
                       textAlign: TextAlign.center,
-                      style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.bold, color: isSelected ? cs.onPrimary : cs.onSurfaceVariant),
+                      style: tt.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
@@ -361,8 +418,17 @@ class _EventDetailsState extends State<EventDetails> {
       children: [
         Icon(Icons.people_alt_rounded, size: 18, color: cs.primary),
         const SizedBox(width: 8),
-        Text("Participants Joined: ", style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant)),
-        Text("$_currentParticipantCount", style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.bold, color: cs.primary)),
+        Text(
+          "Participants Joined: ",
+          style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+        ),
+        Text(
+          "$_currentParticipantCount",
+          style: tt.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: cs.primary,
+          ),
+        ),
       ],
     );
   }
@@ -375,7 +441,11 @@ class _EventDetailsState extends State<EventDetails> {
         onPressed: () async {
           if (widget.joinOrStart == 'PLAY' || widget.joinOrStart == 'RESUME') {
             if (!_gameStarted) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Waiting for host to start the game...")));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Waiting for host to start the game..."),
+                ),
+              );
               return;
             }
             Navigator.push(
@@ -392,8 +462,12 @@ class _EventDetailsState extends State<EventDetails> {
             );
           } else if (widget.joinOrStart == 'START') {
             try {
-              int gridIntSize = int.tryParse(_selectedGridSize.split('x').first.trim()) ?? 5;
-              await AuthService().startGame(code: widget.joinCode, size: gridIntSize);
+              int gridIntSize =
+                  int.tryParse(_selectedGridSize.split('x').first.trim()) ?? 5;
+              await AuthService().startGame(
+                code: widget.joinCode,
+                size: gridIntSize,
+              );
               if (!mounted) return;
               Navigator.push(
                 context,
@@ -412,25 +486,31 @@ class _EventDetailsState extends State<EventDetails> {
                 final detail = e.response!.data['detail'];
                 if (detail != null) errorMsg = detail.toString();
               }
-              if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMsg)));
+              if (mounted)
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(errorMsg)));
             }
           }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: cs.primary,
           foregroundColor: cs.onPrimary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           elevation: 0,
         ),
         child: Text(
-          (widget.joinOrStart == 'PLAY' && !_gameStarted) ? 'WAITING FOR HOST' : widget.joinOrStart,
+          (widget.joinOrStart == 'PLAY' && !_gameStarted)
+              ? 'WAITING FOR HOST'
+              : widget.joinOrStart,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );
   }
 }
-
 
 // CUSTOM WIDGET FOR DETAILS
 class DetailCard extends StatelessWidget {

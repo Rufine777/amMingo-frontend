@@ -38,28 +38,28 @@ class BingoTile extends StatelessWidget {
         child: Center(
           child: isFree
               ? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.star, size: 20, color: colorScheme.onPrimary),
-              const SizedBox(height: 4),
-              Text(
-                "FREE",
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onPrimary,
-                ),
-              ),
-            ],
-          )
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.star, size: 20, color: colorScheme.onPrimary),
+                    const SizedBox(height: 4),
+                    Text(
+                      "FREE",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
+                  ],
+                )
               : Text(
-            cell.letter,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
+                  cell.letter,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
         ),
       ),
     );

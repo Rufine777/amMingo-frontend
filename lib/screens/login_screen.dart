@@ -84,8 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
     try {
-      final response = await AuthService().verifyOtp(widget.email, otpController.text.trim());
-      
+      final response = await AuthService().verifyOtp(
+        widget.email,
+        otpController.text.trim(),
+      );
+
       // Save user code if present in response
       if (response.data != null && response.data["code"] != null) {
         await AuthService.saveUserCode(response.data["code"].toString());
@@ -317,17 +320,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     // to update AuthService to return a Map or similar to get both.
                     // For now, we fetch the profile after login to ensure we have the code.
                     if (result != null) {
-                      print("Got token: $result");
+                      debugPrint("Got token: $result");
                       await AuthService.saveToken(result);
-                      
+
                       // Fetch profile to get the code
                       try {
-                         final profileResp = await AuthService().getProfile(0);
-                         if (profileResp.data != null && profileResp.data["code"] != null) {
-                           await AuthService.saveUserCode(profileResp.data["code"].toString());
-                         }
+                        final profileResp = await AuthService().getProfile(0);
+                        if (profileResp.data != null &&
+                            profileResp.data["code"] != null) {
+                          await AuthService.saveUserCode(
+                            profileResp.data["code"].toString(),
+                          );
+                        }
                       } catch (e) {
-                         debugPrint("Failed to fetch profile code after Google login: $e");
+                        debugPrint(
+                          "Failed to fetch profile code after Google login: $e",
+                        );
                       }
 
                       if (!context.mounted) return;

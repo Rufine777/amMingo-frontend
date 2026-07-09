@@ -20,7 +20,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     super.initState();
     _fetchLeaderboard();
     // Auto-refresh every 15 seconds
-    refreshTimer = Timer.periodic(const Duration(seconds: 15), (_) => _fetchLeaderboard());
+    refreshTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => _fetchLeaderboard(),
+    );
   }
 
   @override
@@ -121,7 +124,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     return Column(
       children: [
         Center(
-          child: _podiumItem(top1, width * 0.125, "1ST", Colors.yellow, colorScheme),
+          child: _podiumItem(
+            top1,
+            width * 0.125,
+            "1ST",
+            Colors.yellow,
+            colorScheme,
+          ),
         ),
         const SizedBox(height: 20),
         Row(
@@ -130,14 +139,26 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             if (top2 != null)
               _podiumItem(top2, width * 0.1, "2ND", Colors.grey, colorScheme),
             if (top3 != null)
-              _podiumItem(top3, width * 0.085, "3RD", Colors.orange, colorScheme),
+              _podiumItem(
+                top3,
+                width * 0.085,
+                "3RD",
+                Colors.orange,
+                colorScheme,
+              ),
           ],
         ),
       ],
     );
   }
 
-  Widget _podiumItem(dynamic entry, double radius, String rank, Color color, ColorScheme colorScheme) {
+  Widget _podiumItem(
+    dynamic entry,
+    double radius,
+    String rank,
+    Color color,
+    ColorScheme colorScheme,
+  ) {
     return Column(
       children: [
         Stack(
@@ -155,7 +176,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             Positioned(
               bottom: -5,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 3,
+                ),
                 decoration: BoxDecoration(
                   color: color,
                   borderRadius: BorderRadius.circular(12),
@@ -195,7 +219,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       ),
       child: Row(
         children: [
-          Text("#${index + 1}", style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            "#${index + 1}",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(width: 12),
           CircleAvatar(
             radius: 18,
@@ -211,7 +238,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           ),
           Text(
             "${entry['points']} pts",
-            style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),

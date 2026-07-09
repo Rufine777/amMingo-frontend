@@ -89,19 +89,26 @@ class _BingoBoardState extends State<BingoBoard> {
       final response = await AuthService().getBoard(widget.joinCode);
       final data = response.data;
       final List<dynamic> tilesData = data['tiles'];
-      
+
       final gameResponse = await AuthService().getGameDetails(widget.joinCode);
       final gameData = gameResponse.data;
-      
+
       if (mounted) {
         setState(() {
           bingoId = data['bingo_id'];
           score = data['points'];
-          
-          boardSize = (tilesData.length == 9) ? 3 : (tilesData.length == 16) ? 4 : 5;
-          
+
+          boardSize = (tilesData.length == 9)
+              ? 3
+              : (tilesData.length == 16)
+              ? 4
+              : 5;
+
           board = tilesData.map((t) {
-            String char = (t['bingo_char'] ?? "?").toString().trim().toUpperCase();
+            String char = (t['bingo_char'] ?? "?")
+                .toString()
+                .trim()
+                .toUpperCase();
             return BingoCell(
               letter: char,
               isMarked: t['image_url'] != null,
@@ -109,7 +116,7 @@ class _BingoBoardState extends State<BingoBoard> {
               col: t['col'] ?? 0,
             );
           }).toList();
-          
+
           if (gameData['end_time'] != null) {
             endTime = DateTime.parse(gameData['end_time']).toUtc();
           }
@@ -232,8 +239,14 @@ class _BingoBoardState extends State<BingoBoard> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("SCORE", style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold)),
-            Text("$score", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            const Text(
+              "SCORE",
+              style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "$score",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            ),
           ],
         ),
       ),
@@ -248,7 +261,10 @@ class _BingoBoardState extends State<BingoBoard> {
           Text(
             widget.eventName,
             textAlign: TextAlign.center,
-            style: tt.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: cs.primary),
+            style: tt.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: cs.primary,
+            ),
           ),
           const SizedBox(height: 4),
           Text("Hosted By: ${widget.hostName}", style: tt.titleSmall),
@@ -267,7 +283,11 @@ class _BingoBoardState extends State<BingoBoard> {
           color: cs.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
           ],
         ),
         child: Column(
@@ -283,7 +303,10 @@ class _BingoBoardState extends State<BingoBoard> {
             ),
             const SizedBox(height: 16),
             if (isLoading)
-              const SizedBox(height: 300, child: Center(child: CircularProgressIndicator()))
+              const SizedBox(
+                height: 300,
+                child: Center(child: CircularProgressIndicator()),
+              )
             else
               AspectRatio(
                 aspectRatio: 1,
@@ -314,16 +337,39 @@ class _BingoBoardState extends State<BingoBoard> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Expanded(child: _buildStatItem("ITEMS CHECKED", "$checkedTiles / ${board.length}", cs, tt)),
+          Expanded(
+            child: _buildStatItem(
+              "ITEMS CHECKED",
+              "$checkedTiles / ${board.length}",
+              cs,
+              tt,
+            ),
+          ),
           const SizedBox(width: 12),
-          Expanded(child: _buildStatItem("TIME LEFT", formatTime(timeLeft), cs, tt, isTimer: true)),
+          Expanded(
+            child: _buildStatItem(
+              "TIME LEFT",
+              formatTime(timeLeft),
+              cs,
+              tt,
+              isTimer: true,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, ColorScheme cs, TextTheme tt, {bool isTimer = false}) {
-    final Color valColor = (isTimer && timeLeft < 60) ? Colors.red : cs.onSurface;
+  Widget _buildStatItem(
+    String label,
+    String value,
+    ColorScheme cs,
+    TextTheme tt, {
+    bool isTimer = false,
+  }) {
+    final Color valColor = (isTimer && timeLeft < 60)
+        ? Colors.red
+        : cs.onSurface;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -333,9 +379,21 @@ class _BingoBoardState extends State<BingoBoard> {
       ),
       child: Column(
         children: [
-          Text(label, style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant, fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: tt.labelSmall?.copyWith(
+              color: cs.onSurfaceVariant,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text(value, style: tt.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: valColor)),
+          Text(
+            value,
+            style: tt.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: valColor,
+            ),
+          ),
         ],
       ),
     );
@@ -349,7 +407,13 @@ class _BingoBoardState extends State<BingoBoard> {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(30),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 4))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -359,7 +423,13 @@ class _BingoBoardState extends State<BingoBoard> {
             }),
             _navItem(Icons.play_arrow_rounded, "PLAY", true, cs, tt, () {}),
             _navItem(Icons.leaderboard_rounded, "RANKS", false, cs, tt, () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => LeaderboardScreen(joinCode: widget.joinCode)));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      LeaderboardScreen(joinCode: widget.joinCode),
+                ),
+              );
             }),
           ],
         ),
@@ -367,7 +437,14 @@ class _BingoBoardState extends State<BingoBoard> {
     );
   }
 
-  Widget _navItem(IconData icon, String label, bool isActive, ColorScheme cs, TextTheme tt, VoidCallback onTap) {
+  Widget _navItem(
+    IconData icon,
+    String label,
+    bool isActive,
+    ColorScheme cs,
+    TextTheme tt,
+    VoidCallback onTap,
+  ) {
     final Color color = isActive ? cs.primary : cs.onSurfaceVariant;
     return InkWell(
       onTap: onTap,
@@ -377,19 +454,27 @@ class _BingoBoardState extends State<BingoBoard> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            isActive 
-              ? Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: cs.primary, shape: BoxShape.circle),
-                  child: Icon(icon, color: cs.onPrimary, size: 24),
-                )
-              : Icon(icon, color: color, size: 24),
+            isActive
+                ? Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: cs.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: cs.onPrimary, size: 24),
+                  )
+                : Icon(icon, color: color, size: 24),
             const SizedBox(height: 4),
-            Text(label, style: tt.labelSmall?.copyWith(color: color, fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+            Text(
+              label,
+              style: tt.labelSmall?.copyWith(
+                color: color,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

@@ -68,17 +68,17 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       final lobbyResponse = await auth.getLobby(code);
       final gameResponse = await auth.getGameDetails(code);
       final game = gameResponse.data;
-      print("Current game details:");
-      print(game);
+      debugPrint("Current game details:");
+      debugPrint(game.toString());
 
-      print("Host name from API: ${game["host_name"]}");
-      print("Host id from API: ${game["host_id"]}");
+      debugPrint("Host name from API: ${game["host_name"]}");
+      debugPrint("Host id from API: ${game["host_id"]}");
       if (!mounted) return;
       final startTime = DateTime.parse(game["start_time"]);
       final endTime = DateTime.parse(game["end_time"]);
       final String qrImage = game["qr_img"] ?? "";
       final duration = endTime.difference(startTime).inMinutes;
-      
+
       String rawDesc = game["description"] ?? "";
       String eventName = "SOCIAL BINGO";
       String description = "";
@@ -91,14 +91,14 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       }
 
       final String hostName = game["host_name"] ?? "Unknown Host";
-      
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => EventDetails(
             qrImage: qrImage,
             joinCode: code,
-            eventName: eventName, 
+            eventName: eventName,
             hostName: hostName,
             hostPfp: game["host_pfp"] ?? "https://i.pravatar.cc/150?img=6",
             joinOrStart: "PLAY",
@@ -258,7 +258,7 @@ class _JoinEventScreenState extends State<JoinEventScreen>
                                     setState(() {
                                       qrResult = barcodes.first.rawValue!;
                                     });
-                                    print("QR Result: $qrResult");
+                                    debugPrint("QR Result: $qrResult");
                                     final uri = Uri.tryParse(qrResult);
 
                                     if (uri != null) {

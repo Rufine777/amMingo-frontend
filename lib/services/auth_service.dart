@@ -4,16 +4,13 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-
 class AuthService {
   static const _storage = FlutterSecureStorage();
   static final CookieJar _cookieJar = CookieJar();
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: "$baseUrl/api",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json"},
     ),
   );
 
@@ -46,14 +43,10 @@ class AuthService {
   Future<Response> verifyOtp(String email, String otp) async {
     final response = await _dio.post(
       "/login/verify-otp",
-      data: {
-        "email": email,
-        "otp": otp,
-      },
+      data: {"email": email, "otp": otp},
     );
     return response;
   }
-
 
   Future<Response> joinGame(String code) async {
     final token = await _storage.read(key: "access_token");
@@ -103,9 +96,7 @@ class AuthService {
     final result = await FlutterWebAuth2.authenticate(
       url: "$baseUrl/api/login/oauth",
       callbackUrlScheme: "amingo",
-      options: const FlutterWebAuth2Options(
-        preferEphemeral: false,
-      ),
+      options: const FlutterWebAuth2Options(preferEphemeral: false),
     );
     return Uri.parse(result).queryParameters["token"];
   }
@@ -133,19 +124,11 @@ class AuthService {
     );
   }
 
-  Future<Response> startGame({
-    required String code,
-    required int size,
-  }) async {
+  Future<Response> startGame({required String code, required int size}) async {
     final token = await _storage.read(key: "access_token");
     _dio.options.headers["Cookie"] = "access_token=$token";
 
-    return await _dio.post(
-      "/games/$code/start",
-      data: {
-        "size": size,
-      },
-    );
+    return await _dio.post("/games/$code/start", data: {"size": size});
   }
 
   Future<Response> getBoard(String code) async {
@@ -185,9 +168,6 @@ class AuthService {
       "image": await MultipartFile.fromFile(image.path),
     });
 
-    return await _dio.post(
-      "/games/tile-submit",
-      data: formData,
-    );
+    return await _dio.post("/games/tile-submit", data: formData);
   }
 }

@@ -227,37 +227,49 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     onPressed: () async {
                       if (_eventNameController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Event name is required")),
+                          const SnackBar(
+                            content: Text("Event name is required"),
+                          ),
                         );
                         return;
                       }
                       if (_timeLimitController.text.isEmpty ||
                           _participantsController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Please fill in all required fields")),
+                          const SnackBar(
+                            content: Text("Please fill in all required fields"),
+                          ),
                         );
                         return;
                       }
 
                       try {
                         // Fetch host profile first
-                        final profileResponse = await _authService.getProfile(0);
-                        final String hostName = profileResponse.data["name"] ?? "Host";
-                        final String? pfp = profileResponse.data["profile_image"];
+                        final profileResponse = await _authService.getProfile(
+                          0,
+                        );
+                        final String hostName =
+                            profileResponse.data["name"] ?? "Host";
+                        final String? pfp =
+                            profileResponse.data["profile_image"];
                         final String hostPfp = (pfp != null && pfp.isNotEmpty)
-                            ? (pfp.startsWith('http') ? pfp : "${AuthService.baseUrl}${pfp.startsWith('/') ? '' : '/'}$pfp")
+                            ? (pfp.startsWith('http')
+                                  ? pfp
+                                  : "${AuthService.baseUrl}${pfp.startsWith('/') ? '' : '/'}$pfp")
                             : "https://i.pravatar.cc/150?img=6";
 
                         final response = await _authService.createGame(
-                          description: "${_eventNameController.text}|${_descriptionController.text}",
+                          description:
+                              "${_eventNameController.text}|${_descriptionController.text}",
                           location: _locationController.text,
                           duration: int.parse(_timeLimitController.text),
                         );
 
-                        final String joinCode = response.data["join_code"] ?? "";
+                        final String joinCode =
+                            response.data["join_code"] ?? "";
                         final String qrImage = response.data["qr_img"] ?? "";
 
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -274,7 +286,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           ),
                         );
                       } catch (e) {
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Failed to create event: $e")),
                         );

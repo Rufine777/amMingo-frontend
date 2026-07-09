@@ -52,15 +52,18 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
     });
 
     // Fetch status every 10 seconds and sync time
-    statusTimer = Timer.periodic(const Duration(seconds: 10), (_) => _fetchStatus());
+    statusTimer = Timer.periodic(
+      const Duration(seconds: 10),
+      (_) => _fetchStatus(),
+    );
   }
 
   Future<void> _fetchStatus() async {
     try {
-      final statusResponse = await AuthService().getGameStatus(widget.joinCode!);
+      final statusResponse = await AuthService().getGameStatus(widget.joinCode);
       final statusData = statusResponse.data;
-      
-      final gameResponse = await AuthService().getGameDetails(widget.joinCode!);
+
+      final gameResponse = await AuthService().getGameDetails(widget.joinCode);
       final gameData = gameResponse.data;
 
       if (mounted) {
@@ -68,7 +71,7 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
           tilesDone = statusData['tiles_done'];
           activePlayers = statusData['active_players'];
           maxCap = statusData['max_cap'].toString();
-          
+
           if (gameData['end_time'] != null) {
             final endTime = DateTime.parse(gameData['end_time']).toUtc();
             final now = DateTime.now().toUtc();
@@ -450,7 +453,8 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => LeaderboardScreen(joinCode: widget.joinCode),
+                  builder: (context) =>
+                      LeaderboardScreen(joinCode: widget.joinCode),
                 ),
               );
             },
