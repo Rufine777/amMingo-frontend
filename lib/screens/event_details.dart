@@ -155,52 +155,56 @@ class _EventDetailsState extends State<EventDetails> {
       ),
     ];
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        centerTitle: true,
+    return PopScope(
+      canPop: widget.joinOrStart != "START",
+      child: Scaffold(
         backgroundColor: colorScheme.surface,
-        elevation: 0,
-        title: Text(
-          "•  LIVE EVENT",
-          style: textTheme.titleMedium?.copyWith(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: colorScheme.surface,
+          elevation: 0,
+          automaticallyImplyLeading: widget.joinOrStart != "START",
+          title: Text(
+            "•  LIVE EVENT",
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
           ),
         ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    _buildBanner(size, colorScheme, textTheme),
-                    const SizedBox(height: 24),
-                    _buildHostHeader(textTheme, colorScheme, size),
-                    const SizedBox(height: 24),
-                    ...details.map(
-                      (item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: DetailCard(
-                          icon: item.icon,
-                          mainDetail: item.mainDetail,
-                          subDetail: item.subDetail,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      _buildBanner(size, colorScheme, textTheme),
+                      const SizedBox(height: 24),
+                      _buildHostHeader(textTheme, colorScheme, size),
+                      const SizedBox(height: 24),
+                      ...details.map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: DetailCard(
+                            icon: item.icon,
+                            mainDetail: item.mainDetail,
+                            subDetail: item.subDetail,
+                          ),
                         ),
                       ),
-                    ),
-                    if (widget.joinOrStart == "START")
-                      _buildQRCodeSection(textTheme, size),
-                    const SizedBox(height: 24),
-                  ],
+                      if (widget.joinOrStart == "START")
+                        _buildQRCodeSection(textTheme, size),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _buildBottomPanel(colorScheme, textTheme, size),
-          ],
+              _buildBottomPanel(colorScheme, textTheme, size),
+            ],
+          ),
         ),
       ),
     );

@@ -440,9 +440,12 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: colorScheme.surface,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
         centerTitle: true,
         backgroundColor: colorScheme.surface,
         surfaceTintColor: colorScheme.surface,
@@ -673,6 +676,6 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
