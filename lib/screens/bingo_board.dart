@@ -55,7 +55,7 @@ class _BingoBoardState extends State<BingoBoard> {
             final now = DateTime.now().toUtc();
             final diff = endTime!.difference(now).inSeconds;
             timeLeft = diff > 0 ? diff : 0;
-            
+
             if (timeLeft <= 0) {
               t.cancel();
               _showTimeUp();

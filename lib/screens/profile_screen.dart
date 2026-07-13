@@ -72,9 +72,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (detail != null) errorMsg = detail.toString();
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMsg)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMsg)));
         setState(() => isLoading = false);
       }
     }
@@ -99,9 +99,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (detail != null) errorMsg = detail.toString();
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMsg)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMsg)));
       }
     } finally {
       if (mounted) setState(() => isLoading = false);

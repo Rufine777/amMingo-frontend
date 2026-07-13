@@ -74,15 +74,19 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       debugPrint("Host name from API: ${game["host_name"]}");
       debugPrint("Host id from API: ${game["host_id"]}");
       if (!mounted) return;
-      
+
       String startTimeStr = game["start_time"] ?? "";
-      if (startTimeStr.isNotEmpty && !startTimeStr.endsWith('Z') && !startTimeStr.contains('+')) {
+      if (startTimeStr.isNotEmpty &&
+          !startTimeStr.endsWith('Z') &&
+          !startTimeStr.contains('+')) {
         startTimeStr += 'Z';
       }
       final startTime = DateTime.parse(startTimeStr).toUtc();
 
       String endTimeStr = game["end_time"] ?? "";
-      if (endTimeStr.isNotEmpty && !endTimeStr.endsWith('Z') && !endTimeStr.contains('+')) {
+      if (endTimeStr.isNotEmpty &&
+          !endTimeStr.endsWith('Z') &&
+          !endTimeStr.contains('+')) {
         endTimeStr += 'Z';
       }
       final endTime = DateTime.parse(endTimeStr).toUtc();

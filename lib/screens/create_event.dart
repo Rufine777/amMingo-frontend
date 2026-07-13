@@ -293,9 +293,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           if (detail != null) errorMsg = detail.toString();
                         }
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(errorMsg)),
-                          );
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(errorMsg)));
                         }
                       }
                     },

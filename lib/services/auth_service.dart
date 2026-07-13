@@ -8,11 +8,7 @@ import 'package:flutter/foundation.dart';
 class AuthService {
   static const _storage = FlutterSecureStorage();
   static final CookieJar _cookieJar = CookieJar();
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: "$baseUrl/api",
-    ),
-  );
+  final Dio _dio = Dio(BaseOptions(baseUrl: "$baseUrl/api"));
 
   AuthService() {
     _dio.interceptors.add(CookieManager(_cookieJar));
