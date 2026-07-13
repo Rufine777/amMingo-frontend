@@ -41,7 +41,7 @@ class _BingoBoardState extends State<BingoBoard> {
   @override
   void initState() {
     super.initState();
-    // Fallback if API takes time
+    // Fallback if API takes time - convert minutes to seconds
     timeLeft = widget.timelimit * 60;
     _fetchBoard();
     _startTimer();
@@ -49,29 +49,27 @@ class _BingoBoardState extends State<BingoBoard> {
 
   void _startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (endTime != null) {
-        final now = DateTime.now().toUtc();
-        final diff = endTime!.difference(now).inSeconds;
-        if (mounted) {
-          setState(() {
+      if (mounted) {
+        setState(() {
+          if (endTime != null) {
+            final now = DateTime.now().toUtc();
+            final diff = endTime!.difference(now).inSeconds;
             timeLeft = diff > 0 ? diff : 0;
-          });
-        }
-        if (diff <= 0) {
-          t.cancel();
-          _showTimeUp();
-        }
-      } else {
-        if (timeLeft <= 0) {
-          t.cancel();
-          _showTimeUp();
-          return;
-        }
-        if (mounted) {
-          setState(() {
-            timeLeft--;
-          });
-        }
+            
+            if (timeLeft <= 0) {
+              t.cancel();
+              _showTimeUp();
+            }
+          } else {
+            if (timeLeft > 0) {
+              timeLeft--;
+            } else {
+              // Only show time up if we have an endTime or if it's been 0 for a while
+              // But for now, just avoid negative values.
+              timeLeft = 0;
+            }
+          }
+        });
       }
     });
   }
@@ -118,7 +116,11 @@ class _BingoBoardState extends State<BingoBoard> {
           }).toList();
 
           if (gameData['end_time'] != null) {
-            endTime = DateTime.parse(gameData['end_time']).toUtc();
+            String endTimeStr = gameData['end_time'];
+            if (!endTimeStr.endsWith('Z') && !endTimeStr.contains('+')) {
+              endTimeStr += 'Z';
+            }
+            endTime = DateTime.parse(endTimeStr).toUtc();
           }
 
           checkedTiles = board.where((c) => c.isMarked).length;

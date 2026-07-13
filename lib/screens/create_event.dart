@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'event_details.dart';
+import 'package:dio/dio.dart';
 import 'package:amingo/services/auth_service.dart';
 
 class CreateEventScreen extends StatefulWidget {
@@ -286,10 +287,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           ),
                         );
                       } catch (e) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Failed to create event: $e")),
-                        );
+                        String errorMsg = "Failed to create event: $e";
+                        if (e is DioException && e.response?.data is Map) {
+                          final detail = e.response!.data['detail'];
+                          if (detail != null) errorMsg = detail.toString();
+                        }
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(errorMsg)),
+                          );
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(

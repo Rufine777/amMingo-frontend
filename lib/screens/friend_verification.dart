@@ -66,7 +66,12 @@ class _FriendVerificationState extends State<FriendVerification> {
   }
 
   Future<void> _openCamera() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 80,
+    );
 
     if (pickedFile == null) return;
 

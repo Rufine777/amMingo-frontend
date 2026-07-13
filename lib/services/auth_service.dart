@@ -11,7 +11,6 @@ class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: "$baseUrl/api",
-      headers: {"Content-Type": "application/json"},
     ),
   );
 
@@ -19,7 +18,7 @@ class AuthService {
     _dio.interceptors.add(CookieManager(_cookieJar));
   }
 
-  static const String baseUrl = "http://localhost:8000";
+  static const String baseUrl = "https://amingoapi.amfoss.in";
 
   Future<void> sendOtp(String email) async {
     await _dio.post("/login/email", data: {"email": email});
@@ -49,10 +48,22 @@ class AuthService {
     return response;
   }
 
-  Future<Response> joinGame(String code) async {
+  Future<Options> _getOptions() async {
     final token = await _storage.read(key: "access_token");
-    _dio.options.headers["Cookie"] = "access_token=$token";
-    return await _dio.post("/games/join/$code", data: {});
+    return Options(
+      headers: {
+        if (token != null) "Cookie": "access_token=$token",
+        if (token != null) "Authorization": "Bearer $token",
+      },
+    );
+  }
+
+  Future<Response> joinGame(String code) async {
+    return await _dio.post(
+      "/games/join/$code",
+      data: {},
+      options: await _getOptions(),
+    );
   }
 
   Future<Response> getLobby(String code) async {
@@ -64,27 +75,39 @@ class AuthService {
   }
 
   Future<Response> getProfile(int id) async {
-    final token = await _storage.read(key: "access_token");
-    _dio.options.headers["Cookie"] = "access_token=$token";
-    return await _dio.get("/profile/$id");
+    return await _dio.get("/profile/$id", options: await _getOptions());
   }
 
   Future<Response> updateProfile({String? name, String? username}) async {
-    final token = await _storage.read(key: "access_token");
-    _dio.options.headers["Cookie"] = "access_token=$token";
     final data = <String, dynamic>{};
     if (name != null) data["name"] = name;
     if (username != null) data["username"] = username;
-    return await _dio.patch("/profile/me", data: data);
+    return await _dio.patch(
+      "/profile/me",
+      data: data,
+      options: await _getOptions(),
+    );
   }
 
   Future<Response> uploadProfileImage(String path) async {
     final token = await _storage.read(key: "access_token");
-    _dio.options.headers["Cookie"] = "access_token=$token";
     final formData = FormData.fromMap({
-      "file": await MultipartFile.fromFile(path),
+      "file": await MultipartFile.fromFile(
+        path,
+        filename: path.split('/').last,
+      ),
     });
-    return await _dio.post("/profile/upload", data: formData);
+    return await _dio.post(
+      "/profile/upload",
+      data: formData,
+      options: Options(
+        contentType: "multipart/form-data",
+        headers: {
+          if (token != null) "Cookie": "access_token=$token",
+          if (token != null) "Authorization": "Bearer $token",
+        },
+      ),
+    );
   }
 
   Future<void> logout() async {
@@ -111,10 +134,6 @@ class AuthService {
     required String location,
     required int duration,
   }) async {
-    final token = await _storage.read(key: "access_token");
-
-    _dio.options.headers["Cookie"] = "access_token=$token";
-
     return await _dio.post(
       "/games",
       data: {
@@ -122,15 +141,17 @@ class AuthService {
         "location": location,
         "duration": duration,
       },
+      options: await _getOptions(),
     );
   }
 
   Future<Response> startGame({required String code, required int size}) async {
-    final token = await _storage.read(key: "access_token");
-    _dio.options.headers["Cookie"] = "access_token=$token";
-
     try {
-      return await _dio.post("/games/$code/start", data: {"size": size});
+      return await _dio.post(
+        "/games/$code/start",
+        data: {"size": size},
+        options: await _getOptions(),
+      );
     } on DioException catch (e) {
       debugPrint("STATUS: ${e.response?.statusCode}");
       debugPrint("BODY: ${e.response?.data}");
@@ -140,10 +161,7 @@ class AuthService {
   }
 
   Future<Response> getBoard(String code) async {
-    final token = await _storage.read(key: "access_token");
-    _dio.options.headers["Cookie"] = "access_token=$token";
-
-    return await _dio.get("/games/$code/board/");
+    return await _dio.get("/games/$code/board/", options: await _getOptions());
   }
 
   Future<Response> getGameStatus(String code) async {
@@ -164,18 +182,30 @@ class AuthService {
     required dynamic image, // File or XFile
   }) async {
     final token = await _storage.read(key: "access_token");
-    _dio.options.headers["Cookie"] = "access_token=$token";
 
     final formData = FormData.fromMap({
-      "bingo_id": bingoId,
-      "row": row,
-      "col": col,
+      "bingo_id": bingoId.toString(),
+      "row": row.toString(),
+      "col": col.toString(),
       "friend_name": friendName,
       "friend_code": friendCode,
       "fact": fact,
-      "image": await MultipartFile.fromFile(image.path),
+      "image": await MultipartFile.fromFile(
+        image.path,
+        filename: image.path.split('/').last,
+      ),
     });
 
-    return await _dio.post("/games/tile-submit", data: formData);
+    return await _dio.post(
+      "/games/tile-submit",
+      data: formData,
+      options: Options(
+        contentType: "multipart/form-data",
+        headers: {
+          if (token != null) "Cookie": "access_token=$token",
+          if (token != null) "Authorization": "Bearer $token",
+        },
+      ),
+    );
   }
 }

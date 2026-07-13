@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 import '../services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -44,7 +45,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickAndUploadImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 80,
+    );
     if (pickedFile == null) return;
 
     setState(() => isLoading = true);
@@ -60,10 +66,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ).showSnackBar(const SnackBar(content: Text("Profile image updated")));
       }
     } catch (e) {
+      String errorMsg = "Failed to upload image: $e";
+      if (e is DioException && e.response?.data is Map) {
+        final detail = e.response!.data['detail'];
+        if (detail != null) errorMsg = detail.toString();
+      }
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Failed to upload image: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMsg)),
+        );
         setState(() => isLoading = false);
       }
     }
@@ -82,10 +93,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
+      String errorMsg = "Failed to update profile: $e";
+      if (e is DioException && e.response?.data is Map) {
+        final detail = e.response!.data['detail'];
+        if (detail != null) errorMsg = detail.toString();
+      }
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Failed to update profile: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMsg)),
+        );
       }
     } finally {
       if (mounted) setState(() => isLoading = false);

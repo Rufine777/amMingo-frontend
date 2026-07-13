@@ -28,6 +28,7 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
   int tilesDone = 0;
   int activePlayers = 0;
   String maxCap = '0';
+  DateTime? _endTime;
 
   @override
   void initState() {
@@ -40,13 +41,18 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
 
   void _startTimers() {
     timer = Timer.periodic(const Duration(seconds: 1), (activeTimer) {
-      if (remainingSeconds <= 0) {
-        activeTimer.cancel();
-        return;
-      }
       if (mounted) {
         setState(() {
-          remainingSeconds--;
+          if (_endTime != null) {
+            final now = DateTime.now().toUtc();
+            remainingSeconds = _endTime!.difference(now).inSeconds;
+          } else {
+            remainingSeconds--;
+          }
+
+          if (remainingSeconds < 0) {
+            remainingSeconds = 0;
+          }
         });
       }
     });
@@ -73,9 +79,13 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
           maxCap = statusData['max_cap'].toString();
 
           if (gameData['end_time'] != null) {
-            final endTime = DateTime.parse(gameData['end_time']).toUtc();
+            String endTimeStr = gameData['end_time'];
+            if (!endTimeStr.endsWith('Z') && !endTimeStr.contains('+')) {
+              endTimeStr += 'Z';
+            }
+            _endTime = DateTime.parse(endTimeStr).toUtc();
             final now = DateTime.now().toUtc();
-            remainingSeconds = endTime.difference(now).inSeconds;
+            remainingSeconds = _endTime!.difference(now).inSeconds;
             if (remainingSeconds < 0) remainingSeconds = 0;
           }
         });
