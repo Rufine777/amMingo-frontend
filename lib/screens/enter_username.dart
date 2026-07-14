@@ -34,9 +34,10 @@ class _CreateUsernameState extends State<CreateUsername> {
     try {
       await AuthService().updateProfile(name: name);
       if (mounted) {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const Roleselection()),
+          (route) => false,
         );
       }
     } catch (e) {

@@ -14,7 +14,7 @@ class Roleselection extends StatelessWidget {
     final height = MediaQuery.of(context).size.height;
 
     return PopScope(
-      canPop: false,
+      canPop: true,
       child: Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: AppBar(
