@@ -1,0 +1,38 @@
+name: Build iOS IPA (Unsigned)
+
+on:
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+
+jobs:
+  build-ios:
+    name: Build iOS Unsigned IPA
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS App (Unsigned)
+        run: flutter build ios --release --no-codesign
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          mv build/ios/iphoneos/Runner.app Payload/
+          zip -r amMingo-unsigned.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: amMingo-unsigned-ipa
+          path: amMingo-unsigned.ipa
+          retention-days: 7
